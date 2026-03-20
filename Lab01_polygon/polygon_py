@@ -1,0 +1,49 @@
+class Polygon:
+    def __init__(self, points):
+        self.points = points
+
+    def is_convex(self):
+        n = len(self.points)
+        if n < 3: return False
+        res = 0
+        for i in range(n):
+            p1 = self.points[i]
+            p2 = self.points[(i + 1) % n]
+            p3 = self.points[(i + 2) % n]
+            cp = (p2[0]-p1[0])*(p3[1]-p2[1]) - (p2[1]-p1[1])*(p3[0]-p2[0])
+            if cp != 0:
+                if res == 0: res = cp
+                elif res * cp < 0: return False
+        return True
+
+class Pentagon:
+    def __init__(self, points):
+        if len(points) != 5: raise ValueError("Треба 5 точок")
+        super().__init__(points)
+
+class Hexagon:
+    def __init__(self, points):
+        if len(points) != 6: raise ValueError("Треба 6 точок")
+        super().__init__(points)
+
+def solve(filename):
+    convex_polygons = []
+    with open(filename, 'r') as f:
+        for line in f:
+            parts = line.split()
+            if not parts: continue
+            ptype = parts[0]
+            coords = list(map(float, parts[1:]))
+            points = [(coords[i], coords[i+1]) for i in range(0, len(coords), 2)]
+
+            if ptype == 'P': poly = Pentagon(points)
+            elif ptype == 'H': poly = Hexagon(points)
+            else: poly = Polygon(points)
+
+            if poly.is_convex():
+                convex_polygons.append(poly)
+
+    for p in convex_polygons:
+        print(f"Опуклий: {type(p).__name__} {p.points}")
+
+solve('filename.txt')
